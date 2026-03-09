@@ -1,6 +1,7 @@
 package src.test;
 
 import src.Graph;
+import src.Localisation;
 
 import java.time.Duration;
 import java.time.LocalTime;
