@@ -1,11 +1,12 @@
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.Map;
 
-public class TestSimulator1000a {
+public class TestSimulator1000b {
     public static void main(String[] args) {
+        double epsilon = 0.1 ;
+        double k = 0.05 ;
         System.out.println("---------------------------------------------------------------");
         LocalTime start = LocalTime.now() ;
         Graph graph = new Graph("nodes_1000.csv","edges_1000.csv");
@@ -16,9 +17,9 @@ public class TestSimulator1000a {
         System.out.println("Temps de chargement : "+d.toMinutes()+"m"+d.toSecondsPart()+"s"+d.toNanosPart()+"ns");
         System.out.println();
         System.out.println("---------------------------------------------------------------");
-        long idDepartCrue = 5437074483l ;
+        long idDepartCrue = 324434865 ;
         start = LocalTime.now() ;
-        Localisation[] zoneInondee = graph.determinerZoneInondee(new long[]{idDepartCrue});
+        Localisation[] zoneInondee = graph.determinerZoneInondee(new long[]{idDepartCrue},epsilon);
         LocalTime tempCalculZoneInondée = LocalTime.now() ;
         d = Duration.between(start, tempCalculZoneInondée);
         System.out.println();
@@ -31,7 +32,7 @@ public class TestSimulator1000a {
         }
         System.out.println();
         System.out.println("---------------------------------------------------------------");
-        long idDepartTrajet = 1132625429 ;
+        long idDepartTrajet =  1132625429 ;
         long idDestination = 3060525658l ;
         start = LocalTime.now() ;
         Deque<Localisation> chemin = graph.trouverCheminLePlusCourtPourContournerLaZoneInondee(idDepartTrajet,idDestination,zoneInondee) ;
@@ -52,7 +53,7 @@ public class TestSimulator1000a {
         System.out.println("---------------------------------------------------------------");
         System.out.println();
         start = LocalTime.now() ;
-        Map<Localisation,Double> tFlood =  graph.determinerChronologieDeLaCrue(new long[]{idDepartCrue},0);
+        Map<Localisation,Double> tFlood =  graph.determinerChronologieDeLaCrue(new long[]{idDepartCrue},0,k);
         LocalTime tempsDeterminationChronologieDeLaCrue = LocalTime.now() ;
         d = Duration.between(start,tempsDeterminationChronologieDeLaCrue);
         System.out.println("Temps de calcul pour la chronologie de la crue : "+d.toMinutes()+"m"+d.toSecondsPart()+"s"+d.toNanosPart()+"ns");
