@@ -1,3 +1,7 @@
+package src.test;
+
+import src.Graph;
+
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Arrays;
