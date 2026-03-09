@@ -1,23 +1,23 @@
 package src;
 
 public class Arc {
-    Noeud origine;
-    Noeud arrivee;
+    Localisation origine;
+    Localisation arrivee;
     double distance;
     String nomRue;
 
-    public Arc(Noeud origine, Noeud arrivee, double distance, String nomRue) {
+    public Arc(Localisation origine, Localisation arrivee, double distance, String nomRue) {
         this.origine = origine;
         this.arrivee = arrivee;
         this.distance = distance;
         this.nomRue = nomRue;
     }
 
-  public Noeud getArrivee() {
+  public Localisation getArrivee() {
     return arrivee;
   }
 
-  public void setArrivee(Noeud arrivee) {
+  public void setArrivee(Localisation arrivee) {
     this.arrivee = arrivee;
   }
 
@@ -37,11 +37,11 @@ public class Arc {
     this.nomRue = nomRue;
   }
 
-  public Noeud getOrigine() {
+  public Localisation getOrigine() {
     return origine;
   }
 
-  public void setOrigine(Noeud origine) {
+  public void setOrigine(Localisation origine) {
     this.origine = origine;
   }
 }

@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Deque;
 import java.util.Map;
+import src.Localisation;
 
 public class TestSimulator10 {
     public static void main(String[] args) {
