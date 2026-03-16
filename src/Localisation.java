@@ -1,6 +1,4 @@
-package src;
-
-public class Noeud {
+public class Localisation {
 
   private int id;
   private int latitude;
@@ -8,7 +6,7 @@ public class Noeud {
   private String nom;
   private int altitude;
 
-  public Noeud(int altitude, int id, int latitude, int longitude, String nom) {
+  public Localisation(int altitude, int id, int latitude, int longitude, String nom) {
     this.altitude = altitude;
     this.id = id;
     this.latitude = latitude;
