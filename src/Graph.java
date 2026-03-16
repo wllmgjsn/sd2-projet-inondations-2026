@@ -1,18 +1,27 @@
 package src;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Set;
 
 public class Graph {
+
+    private Map<Localisation, Set<Arc>> listeRoadLocalisation;
+
+
 
 	//ATTRIBUT ?
 	//TODO
 
     public Graph(String localisations, String roads)  {
+
         //TODO
     }
 
-    public Localisation[] determinerZoneInondee(long[] idsOrigin,double epsilon) {
+    public Localisation[] determinerZoneInondee(long[] idsOrigin, double epsilon) {
+        ArrayDeque<Localisation> file;
+        Set<Localisation> dejaVisite;
         //TODO
 		return null ;
     }
