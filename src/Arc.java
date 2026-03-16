@@ -1,5 +1,3 @@
-package src;
-
 public class Arc {
   Localisation origine;
   Localisation arrivee;
