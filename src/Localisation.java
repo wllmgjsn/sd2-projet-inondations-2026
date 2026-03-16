@@ -6,7 +6,7 @@ public class Localisation {
   private String nom;
   private int altitude;
 
-  public Localisation(int altitude, int id, int latitude, int longitude, String nom) {
+  public Localisation(int id, String nom, int latitude, int longitude, int altitude) {
     this.altitude = altitude;
     this.id = id;
     this.latitude = latitude;
