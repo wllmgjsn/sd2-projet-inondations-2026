@@ -2,15 +2,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
+import java.util.*;
 import java.util.HashSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Graph {
 
@@ -122,7 +115,41 @@ public class Graph {
      * au noeud de destination sans passer par un point inondé
      */
     public Deque<Localisation> trouverCheminLePlusCourtPourContournerLaZoneInondee(long idOrigin, long idDestination, Localisation[] floodedZone) {
-        //TODO
+        Set<Localisation> zoneInondee = new HashSet<>(Arrays.asList(floodedZone));
+
+        Localisation depart = null;
+        Localisation arrivee = null;
+
+        for (Localisation localisation : listeRoadLocalisation.keySet()) {
+            if (localisation.getId() == idOrigin)
+                depart = localisation;
+            if (localisation.getId() == idDestination)
+                arrivee = localisation;
+        }
+
+        Queue<Object[]> fileAttente = new PriorityQueue<>((a, b) -> (int) a[1] - (int) b[1]);
+        fileAttente.add(new Object[]{depart, 0});
+
+        Set<Localisation> dejaVisite = new HashSet<>();
+
+        while (!fileAttente.isEmpty()) {
+            Object[] top = fileAttente.poll();
+            Localisation src = (Localisation) top[0];
+            int cout = (int) top[1];
+
+            if (dejaVisite.contains(src))
+                continue;
+
+            if (src.equals(arrivee))
+                break;
+
+            // Reprendre la liste des adjacents de src
+            Set<Arc> arcs = listeRoadLocalisation.get(src);
+
+            // Aucun adjacent
+            if (arcs == null)
+                continue;
+        }
         return null ;
     }
 
