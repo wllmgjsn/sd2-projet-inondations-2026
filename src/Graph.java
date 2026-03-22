@@ -127,30 +127,62 @@ public class Graph {
                 arrivee = localisation;
         }
 
-        Queue<Object[]> fileAttente = new PriorityQueue<>((a, b) -> (int) a[1] - (int) b[1]);
-        fileAttente.add(new Object[]{depart, 0});
+        Queue<Object[]> file = new PriorityQueue<>((a, b) -> (int) a[1] - (int) b[1]);
+        file.add(new Object[]{depart, 0});
 
         Set<Localisation> dejaVisite = new HashSet<>();
 
-        while (!fileAttente.isEmpty()) {
-            Object[] top = fileAttente.poll();
+        // Key = distination, value = depart
+        Map<Localisation, Localisation> parcours = new HashMap<>();
+
+        // Dijkstra
+        while (!file.isEmpty()) {
+            Object[] top = file.poll();
             Localisation src = (Localisation) top[0];
             int cout = (int) top[1];
 
+            // Ignorer noeud deja visite
             if (dejaVisite.contains(src))
                 continue;
+            dejaVisite.add(src);
 
+            // Arreter la boucle : destination atteinte
             if (src.equals(arrivee))
                 break;
 
-            // Reprendre la liste des adjacents de src
+            // Reprendre les arcs sortant du noeud courant
             Set<Arc> arcs = listeRoadLocalisation.get(src);
 
-            // Aucun adjacent
+            // Aucun arcs
             if (arcs == null)
                 continue;
+
+            for (Arc arc : arcs) {
+                Localisation destination = arc.getArrivee();
+
+                // Ignorer les arcs inondés
+                if (zoneInondee.contains(destination))
+                    continue;
+
+                if (!dejaVisite.contains(destination)) {
+                    if (!parcours.containsKey(destination)) {
+                        parcours.put(destination, src);
+                    }
+                    file.add(new Object[]{destination, cout+1});
+                }
+            }
         }
-        return null ;
+
+        if (!dejaVisite.contains(arrivee)) return  null;
+
+        Deque<Localisation> chemin = new ArrayDeque<>();
+        Localisation localisation = arrivee;
+        while (localisation != null) {
+            chemin.addFirst(localisation);
+            localisation = parcours.get(localisation);
+        }
+
+        return chemin;
     }
 
     /**
