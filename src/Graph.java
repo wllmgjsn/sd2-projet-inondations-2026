@@ -1,65 +1,53 @@
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashSet;
 
 public class Graph {
 
-    private final Map<Localisation, Set<Arc>> listeRoadLocalisation;
-    private final Map<Long, Localisation> idLocalisations;
+  private final Map<Localisation, Set<Arc>> listeRoadLocalisation;
+  private final Map<Long, Localisation> idLocalisations;
 
-    public Graph(String localisations, String roads)  {
-        this.idLocalisations = new HashMap<>();
-        this.listeRoadLocalisation = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(localisations))) {
-            String line;
-            br.readLine();
-            while ((line = br.readLine()) != null) {
-                String[] loca = line.split(",");
-                Long id       = Long.parseLong(loca[0].trim());
-                String nom    = loca[1].trim();
-                double latitude  = Double.parseDouble(loca[2].trim());
-                double longitude = Double.parseDouble(loca[3].trim());
-                double altitude  = Double.parseDouble(loca[4].trim());
+  public Graph(String localisations, String roads) {
+    this.idLocalisations = new HashMap<>();
+    this.listeRoadLocalisation = new HashMap<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(localisations))) {
+      String line;
+      br.readLine();
+      while ((line = br.readLine()) != null) {
+        String[] loca = line.split(",");
+        Long id = Long.parseLong(loca[0].trim());
+        String nom = loca[1].trim();
+        double latitude = Double.parseDouble(loca[2].trim());
+        double longitude = Double.parseDouble(loca[3].trim());
+        double altitude = Double.parseDouble(loca[4].trim());
 
-                Localisation newLoc = new Localisation(id, nom, latitude, longitude, altitude);
-                listeRoadLocalisation.put(newLoc, new HashSet<>());
-                idLocalisations.put(newLoc.getId(), newLoc);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(roads))) {
-            String line;
-            br.readLine();
-            while ((line = br.readLine()) != null) {
-                String[] road = line.split(",");
-                Localisation origin = idLocalisations.get(Long.parseLong(road[0]));
-                Localisation arrivee = idLocalisations.get(Long.parseLong(road[1]));
-                double distance = Double.parseDouble(road[2]);
-                String nomRue = road[3];
-                Arc newRue = new Arc(origin, arrivee, distance, nomRue);
-                listeRoadLocalisation.get(origin).add(newRue);
-            }
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(localisations))) {
-            String line;
-            br.readLine();
-            while ((line = br.readLine()) != null) {
-                String[] mots = line.split(","); // ← ton séparateur ici
-                for (String mot : mots) {
-                    System.out.println(mot.trim());
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Localisation newLoc = new Localisation(id, nom, latitude, longitude, altitude);
+        listeRoadLocalisation.put(newLoc, new HashSet<>());
+        idLocalisations.put(newLoc.getId(), newLoc);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+
+    try (BufferedReader br = new BufferedReader(new FileReader(roads))) {
+      String line;
+      br.readLine();
+      while ((line = br.readLine()) != null) {
+        String[] road = line.split(",");
+        Localisation origin = idLocalisations.get(Long.parseLong(road[0]));
+        Localisation arrivee = idLocalisations.get(Long.parseLong(road[1]));
+        double distance = Double.parseDouble(road[2]);
+        String nomRue = road[3];
+        Arc newRue = new Arc(origin, arrivee, distance, nomRue);
+        listeRoadLocalisation.get(origin).add(newRue);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
     /**
      * ALGO 1 : SIMULATION DE LA CRUE
@@ -243,41 +231,105 @@ public class Graph {
         return tflood;
     }
 
-    /**
-     * ALGO 4 : EVACUATION DYNAMIQUE
-     *
-     * @param idOrigin Origine du chemin d'évacuation
-     * @param idEvacuation Noeud d'évacutation
-     * @param vVehicule Vitesse du véhicule
-     * @param tFlood Map associant chaque noeud au moment à partir duquel il est inondé (algo. 3)
-     * @return Liste de noeuds représentant le chemin le plus cours entre le noeud d'origine et le noeud d'évacuation
-     */
-    public Deque<Localisation> trouverCheminDEvacuationLePlusCourt(long idOrigin, long idEvacuation, double vVehicule, Map<Localisation,Double> tFlood) {
-        //TODO
-        return null ;
+  /**
+   * ALGO 4 : EVACUATION DYNAMIQUE
+   *
+   * @param idOrigin     Origine du chemin d'évacuation
+   * @param idEvacuation Noeud d'évacutation
+   * @param vVehicule    Vitesse du véhicule
+   * @param tFlood       Map associant chaque noeud au moment à partir duquel il est inondé (algo.
+   *                     3)
+   * @return Liste de noeuds representant le chemin le plus cours entre le noeud d'origine et le
+   * noeud d'évacuation
+   */
+  public Deque<Localisation> trouverCheminDEvacuationLePlusCourt(long idOrigin, long idEvacuation,
+      double vVehicule, Map<Localisation, Double> tFlood) {
+
+
+    Localisation origin = idLocalisations.get(idOrigin);
+    Localisation evac = idLocalisations.get(idEvacuation);
+
+    if (tFlood.getOrDefault(origin, Double.POSITIVE_INFINITY) <= 0.0) {
+      return new ArrayDeque<>();
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Graph: ")
-            .append(listeRoadLocalisation.size())
-            .append(" noeuds, ")
-            .append(listeRoadLocalisation.values().stream().mapToInt(Set::size).sum())
-            .append(" arcs\n");
-        sb.append("─".repeat(50)).append("\n");
+    Set<Localisation> noeudsFixes = new HashSet<>();
+    PriorityQueue<Map.Entry<Localisation, Double>> tempsProvisoiresVehicule = new PriorityQueue<>(
+        Comparator.comparingDouble(Map.Entry::getValue));
+    Map<Localisation, Double> meilleursTemps = new HashMap<>();
+    Map<Localisation, Localisation> predecesseurs = new HashMap<>();
 
-        for (Map.Entry<Localisation, Set<Arc>> entry : listeRoadLocalisation.entrySet()) {
-            sb.append(entry.getKey()).append("\n");
-            if (entry.getValue().isEmpty()) {
-                sb.append("   (aucun arc sortant)\n");
-            } else {
-                for (Arc arc : entry.getValue()) {
-                    sb.append("   -> ").append(arc).append("\n");
-                }
-            }
+    tempsProvisoiresVehicule.add(new SimpleEntry<>(origin, 0.0));
+
+    meilleursTemps.put(origin, 0.0);
+
+    while (!tempsProvisoiresVehicule.isEmpty()) {
+      Map.Entry<Localisation, Double> top = tempsProvisoiresVehicule.poll();
+      Localisation pos = top.getKey();
+
+      double tCumuleVehicule = top.getValue();
+
+      if (tCumuleVehicule > meilleursTemps.getOrDefault(pos, Double.POSITIVE_INFINITY)) {
+        continue;
+      }
+
+      if (noeudsFixes.contains(pos)) {
+        continue;
+      }
+      noeudsFixes.add(pos);
+
+      if (pos.equals(evac)) {
+        break;
+      }
+
+      for (Arc rue : listeRoadLocalisation.get(pos)) {
+        Localisation voisin = rue.getArrivee();
+        double tArrivee = tCumuleVehicule + rue.getDistance() / vVehicule;
+        Double tInondation = tFlood.get(rue.getArrivee());
+
+        if (tInondation != null && tArrivee >= tInondation) {
+          continue;
         }
-        return sb.toString();
+
+        if (!noeudsFixes.contains(voisin)
+            && tArrivee < meilleursTemps.getOrDefault(voisin, Double.POSITIVE_INFINITY)) {
+          meilleursTemps.put(voisin, tArrivee);
+          predecesseurs.put(voisin, pos);
+          tempsProvisoiresVehicule.add(new SimpleEntry<>(voisin, tArrivee));
+        }
+      }
     }
+    ArrayDeque<Localisation> chemin = new ArrayDeque<>();
+    Localisation courant = evac;
+    while (courant != null) {
+      chemin.addFirst(courant);
+      courant = predecesseurs.get(courant);
+    }
+    return chemin.getFirst().equals(origin) ? chemin : new ArrayDeque<>();
+  }
+
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Graph: ")
+        .append(listeRoadLocalisation.size())
+        .append(" noeuds, ")
+        .append(listeRoadLocalisation.values().stream().mapToInt(Set::size).sum())
+        .append(" arcs\n");
+    sb.append("─".repeat(50)).append("\n");
+
+    for (Map.Entry<Localisation, Set<Arc>> entry : listeRoadLocalisation.entrySet()) {
+      sb.append(entry.getKey()).append("\n");
+      if (entry.getValue().isEmpty()) {
+        sb.append("   (aucun arc sortant)\n");
+      } else {
+        for (Arc arc : entry.getValue()) {
+          sb.append("   -> ").append(arc).append("\n");
+        }
+      }
+    }
+    return sb.toString();
+  }
 
 }

@@ -43,5 +43,8 @@ public class Arc {
     this.origine = origine;
   }
 
-
+  @Override
+  public String toString() {
+    return "Rue (" + nomRue + ") vers " + arrivee.getId() + ", dist=" + distance + "m";
+  }
 }

@@ -69,4 +69,10 @@ public class Localisation {
   public int hashCode() {
     return Objects.hashCode(id);
   }
+
+  @Override
+  public String toString() {
+    return "[NOEUD= " + id + ", ALTITUDE= " + altitude + "m]";
+  }
+
 }
