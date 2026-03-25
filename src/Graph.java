@@ -103,73 +103,45 @@ public class Graph {
      */
     public Deque<Localisation> trouverCheminLePlusCourtPourContournerLaZoneInondee(long idOrigin, long idDestination, Localisation[] floodedZone) {
         Set<Localisation> zoneInondee = new HashSet<>(Arrays.asList(floodedZone));
-
-        Localisation depart = null;
-        Localisation arrivee = null;
-
-        for (Localisation localisation : listeRoadLocalisation.keySet()) {
-            if (localisation.getId() == idOrigin)
-                depart = localisation;
-            if (localisation.getId() == idDestination)
-                arrivee = localisation;
-        }
-
-        Queue<Object[]> file = new PriorityQueue<>((a, b) -> (int) a[1] - (int) b[1]);
-        file.add(new Object[]{depart, 0});
-
+        Deque<Localisation> resultat = new ArrayDeque<>();
         Set<Localisation> dejaVisite = new HashSet<>();
+        Queue<Localisation> file = new LinkedList<>();
+        Map<Localisation, Localisation> predecesseurs = new HashMap<>();
 
-        // Key = distination, value = depart
-        Map<Localisation, Localisation> parcours = new HashMap<>();
 
-        // Dijkstra
+        Localisation depart = idLocalisations.get(idOrigin);
+        Localisation arrivee = idLocalisations.get(idDestination);
+
+
+        dejaVisite.add(depart);
+        file.add(depart);
+        predecesseurs.put(depart, null);
+
+        // --- BFS ---
         while (!file.isEmpty()) {
-            Object[] top = file.poll();
-            Localisation src = (Localisation) top[0];
-            int cout = (int) top[1];
+            Localisation courant = file.poll();
+            Set<Arc> adjacents = listeRoadLocalisation.get(courant);
 
-            // Ignorer noeud deja visite
-            if (dejaVisite.contains(src))
-                continue;
-            dejaVisite.add(src);
-
-            // Arreter la boucle : destination atteinte
-            if (src.equals(arrivee))
+            if (courant.equals(arrivee)) {
+                Localisation l = arrivee;
+                while (l != null) {
+                    resultat.addFirst(l);
+                    l = predecesseurs.get(l);
+                }
                 break;
+            }
 
-            // Reprendre les arcs sortant du noeud courant
-            Set<Arc> arcs = listeRoadLocalisation.get(src);
-
-            // Aucun arcs
-            if (arcs == null)
-                continue;
-
-            for (Arc arc : arcs) {
-                Localisation destination = arc.getArrivee();
-
-                // Ignorer les arcs inondés
-                if (zoneInondee.contains(destination))
-                    continue;
-
-                if (!dejaVisite.contains(destination)) {
-                    if (!parcours.containsKey(destination)) {
-                        parcours.put(destination, src);
-                    }
-                    file.add(new Object[]{destination, cout+1});
+            // Explore chaque voisin du noead courant
+            for (Arc adjacent : adjacents) {
+                if (!dejaVisite.contains(adjacent.arrivee) && !zoneInondee.contains(adjacent.arrivee)) {
+                    file.add(adjacent.arrivee);
+                    dejaVisite.add(adjacent.arrivee);
+                    predecesseurs.put(adjacent.arrivee, courant);
                 }
             }
         }
 
-        if (!dejaVisite.contains(arrivee)) return  null;
-
-        Deque<Localisation> chemin = new ArrayDeque<>();
-        Localisation localisation = arrivee;
-        while (localisation != null) {
-            chemin.addFirst(localisation);
-            localisation = parcours.get(localisation);
-        }
-
-        return chemin;
+        return resultat;
     }
 
     /**
