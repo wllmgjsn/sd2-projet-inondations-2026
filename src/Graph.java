@@ -84,7 +84,7 @@ public class Graph {
             }
 
             if(depart != null && !dejaVisite.contains(depart)){
-                file.addFirst(depart);
+                file.add(depart);
                 dejaVisite.add(depart);
                 resultat.add(depart);
             }
@@ -101,7 +101,6 @@ public class Graph {
                 }
             }
         }
-        //TODO
         return resultat.toArray(new Localisation[0]) ;
     }
 
@@ -194,8 +193,49 @@ public class Graph {
      * @return Map associant chaque noeud au moment à partir duquel il est inondé
      */
     public Map<Localisation,Double> determinerChronologieDeLaCrue(long[] idsOrigin, double vWaterInit,double k) {
-        //TODO
-        return null ;
+        PriorityQueue<Etat> priorityQueue = new PriorityQueue<>(Comparator.comparingDouble(
+            Etat::getTemps));
+        Map<Localisation, Double> tflood = new HashMap<>();
+
+        for(Localisation l : idLocalisations.values()){
+            tflood.put(l, Double.POSITIVE_INFINITY);
+        }
+
+        for(Long id : idsOrigin){
+            Localisation l = idLocalisations.get(id);
+            tflood.put(l, 0.0);
+            priorityQueue.add(new Etat(l, 0.0, vWaterInit));
+        }
+
+        while(!priorityQueue.isEmpty()){
+            Etat current = priorityQueue.poll();
+
+            if(current.getTemps()  > tflood.get(current.getLocalisation())){
+                continue;
+            }
+
+            Set<Arc> arcs = listeRoadLocalisation.get(current.getLocalisation());
+
+            for(Arc a : arcs){
+                Localisation voisin = a.arrivee;
+                double pente = (current.getLocalisation().getAltitude() - voisin.getAltitude()) / a.distance;
+                double nouvelleVitesse = current.getVitesse() + (k*pente);
+
+                if(nouvelleVitesse <= 0){
+                    continue;
+                }
+
+                double tempsArc = a.distance/nouvelleVitesse;
+                double nouveauT = current.getTemps() + tempsArc;
+
+                if(nouveauT < tflood.get(voisin)){
+                    tflood.put(voisin, nouveauT);
+                    priorityQueue.add(new Etat(voisin, nouveauT, nouvelleVitesse));
+                }
+            }
+        }
+
+        return tflood;
     }
 
     /**
