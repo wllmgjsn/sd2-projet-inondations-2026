@@ -1,12 +1,14 @@
+import java.util.Objects;
+
 public class Localisation {
 
-  private int id;
-  private int latitude;
-  private int longitude;
+  private Long id;
+  private double latitude;
+  private double longitude;
   private String nom;
-  private int altitude;
+  private double altitude;
 
-  public Localisation(int altitude, int id, int latitude, int longitude, String nom) {
+  public Localisation(Long id, String nom, double latitude, double longitude, double altitude) {
     this.altitude = altitude;
     this.id = id;
     this.latitude = latitude;
@@ -14,7 +16,7 @@ public class Localisation {
     this.nom = nom;
   }
 
-  public int getAltitude() {
+  public double getAltitude() {
     return altitude;
   }
 
@@ -22,23 +24,23 @@ public class Localisation {
     this.altitude = altitude;
   }
 
-  public int getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public int getLatitude() {
+  public double getLatitude() {
     return latitude;
   }
 
-  public void setLatitude(int latitude) {
+  public void setLatitude(double latitude) {
     this.latitude = latitude;
   }
 
-  public int getLongitude() {
+  public double getLongitude() {
     return longitude;
   }
 
@@ -52,5 +54,19 @@ public class Localisation {
 
   public void setNom(String nom) {
     this.nom = nom;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Localisation that = (Localisation) o;
+    return id == that.id;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
   }
 }
