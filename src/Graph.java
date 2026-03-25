@@ -197,15 +197,18 @@ public class Graph {
             Etat::getTemps));
         Map<Localisation, Double> tflood = new HashMap<>();
 
-        for(Localisation l : idLocalisations.values()){
+        for (Localisation l : idLocalisations.values()) {
             tflood.put(l, Double.POSITIVE_INFINITY);
         }
 
-        for(Long id : idsOrigin){
+        for (long id : idsOrigin) {
             Localisation l = idLocalisations.get(id);
-            tflood.put(l, 0.0);
-            priorityQueue.add(new Etat(l, 0.0, vWaterInit));
+            if (l != null) {
+                tflood.put(l, 0.0);
+                priorityQueue.add(new Etat(l, 0.0, vWaterInit));
+            }
         }
+
 
         while(!priorityQueue.isEmpty()){
             Etat current = priorityQueue.poll();
@@ -228,11 +231,13 @@ public class Graph {
                 double tempsArc = a.distance/nouvelleVitesse;
                 double nouveauT = current.getTemps() + tempsArc;
 
-                if(nouveauT < tflood.get(voisin)){
+                if (nouveauT < tflood.getOrDefault(voisin, Double.POSITIVE_INFINITY)) {
                     tflood.put(voisin, nouveauT);
                     priorityQueue.add(new Etat(voisin, nouveauT, nouvelleVitesse));
                 }
             }
+
+            tflood.entrySet().removeIf(e -> Double.isInfinite(e.getValue()));
         }
 
         return tflood;
